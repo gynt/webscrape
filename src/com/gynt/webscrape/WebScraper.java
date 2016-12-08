@@ -15,11 +15,11 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
-public class Parser {
+public class WebScraper {
 
 	private Document xmldoc;
 
-	private Parser() {
+	private WebScraper() {
 
 	}
 	
@@ -50,12 +50,12 @@ public class Parser {
 		}
 	}
 
-	public static final Parser getInstance(String xml) throws XMLException {
+	public static final WebScraper getInstance(String xml) throws XMLException {
 		return getInstance(Jsoup.parse(xml, "", org.jsoup.parser.Parser.xmlParser()));
 	}
 
-	public static final Parser getInstance(Document xmldoc) throws XMLException {
-		Parser result = new Parser();
+	public static final WebScraper getInstance(Document xmldoc) throws XMLException {
+		WebScraper result = new WebScraper();
 		verify(xmldoc);
 		result.xmldoc = xmldoc;
 		return result;
@@ -227,7 +227,7 @@ public class Parser {
 		try {
 			String data = new String(Files.readAllBytes(new File(xmlformatfile).toPath()), StandardCharsets.UTF_8);
 			try {
-				Parser p = Parser.getInstance(data);
+				WebScraper p = WebScraper.getInstance(data);
 				try {
 					Document page = Jsoup.connect(url).get();
 					try {
