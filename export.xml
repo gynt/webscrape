@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project default="create_run_jar" name="Create Runnable Jar for Project webscrape with libraries in sub-folder">
+    <!--this file was created by Eclipse Runnable JAR Export Wizard-->
+    <!--ANT 1.7 is required                                        -->
+    <!--define folder properties-->
+    <property name="dir.buildfile" value="."/>
+    <property name="dir.workspace" value="/home/frank/Software/eclipse/neon/workspace"/>
+    <property name="dir.jarfile" value="${dir.buildfile}"/>
+    <target name="create_run_jar">
+        <jar destfile="${dir.jarfile}/webscrape-1.0.jar">
+            <manifest>
+                <attribute name="Main-Class" value="com.gynt.webscrape.Parser"/>
+                <attribute name="Class-Path" value=". webscrape-1.0_lib/jsoup-1.10.1.jar"/>
+            </manifest>
+            <fileset dir="${dir.jarfile}/bin"/>
+        </jar>
+        <mkdir dir="${dir.jarfile}/lib"/>
+        <copy file="${dir.jarfile}/lib/jsoup-1.10.1.jar" todir="${dir.jarfile}/lib"/>
+        <copy file="${dir.jarfile}/lib/jsoup-1.10.1_LICENSE.txt" todir="${dir.jarfile}/lib"/>
+    </target>
+</project>
