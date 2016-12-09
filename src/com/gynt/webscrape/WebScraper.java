@@ -107,7 +107,7 @@ public class WebScraper {
 			extractData(xml, html, objmap);
 			if (xml.children().size() > 0) {
 				for (int i = 0; i < xml.children().size(); i++) {
-					if (xml.child(i).hasAttr("query")) {
+					if (xml.child(i).hasAttr("query") && !xml.child(i).attr("query").isEmpty()) {
 						Element queryfind = resolveQuery(xml.child(i), html);
 						if (queryfind == null)
 							continue;
@@ -143,7 +143,7 @@ public class WebScraper {
 			if (xml.children().size() > 0) {
 				if (html.children().size() == 0)
 					throw new ParseException("XML does have children, while HTML does not");
-				if (xml.children().first().hasAttr("query")) {
+				if (xml.children().first().hasAttr("query") && !xml.children().first().attr("query").isEmpty()) {
 					Element queryfind = resolveQuery(xml.child(0), html);
 					if (queryfind != null)
 						parse(xml.children().first(), queryfind, objects, objmap);
@@ -238,32 +238,38 @@ public class WebScraper {
 					try {
 						Collection<Map<String, Object>> result = p.parse(page);
 						StringBuffer sb = new StringBuffer();
-						sb.append("[");
+						
 						Iterator<Map<String, Object>> mapiterator = result.iterator();
-						while (mapiterator.hasNext()) {
-							Map<String, Object> map = mapiterator.next();
-							sb.append("{");
-							Iterator<Entry<String, Object>> entryiterator = map.entrySet().iterator();
-							while (entryiterator.hasNext()) {
-								Entry<String, Object> entry = entryiterator.next();
-								sb.append("\"");
-								sb.append(entry.getKey());
-								sb.append("\"");
+						if(mapiterator.hasNext()) {
+							sb.append("[");
+							while (mapiterator.hasNext()) {
+								Map<String, Object> map = mapiterator.next();
+								Iterator<Entry<String, Object>> entryiterator = map.entrySet().iterator();
+								if(entryiterator.hasNext()) {
+									sb.append("{");
+									while (entryiterator.hasNext()) {
+										Entry<String, Object> entry = entryiterator.next();
+										sb.append("\"");
+										sb.append(entry.getKey());
+										sb.append("\"");
 
-								sb.append(":");
+										sb.append(":");
 
-								sb.append("\"");
-								sb.append(entry.getValue());
-								sb.append("\"");
-								if (entryiterator.hasNext())
+										sb.append("\"");
+										String value = (String) entry.getValue();
+										value=value.replaceAll("\"", "\\\"");
+										sb.append(entry.getValue());
+										sb.append("\"");
+										if (entryiterator.hasNext())
+											sb.append(",");
+									}
+									sb.append("}");
+								}
+								if (mapiterator.hasNext())
 									sb.append(",");
 							}
-							sb.append("}");
-							if (mapiterator.hasNext())
-								sb.append(",");
+							sb.append("]");
 						}
-						sb.append("]");
-
 						if (args.length == 3) {
 							File f = new File(args[2]);
 							try {
