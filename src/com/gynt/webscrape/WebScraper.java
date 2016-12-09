@@ -63,8 +63,6 @@ public class WebScraper {
 
 	private static final Element resolveQuery(Element xml, Element html) throws QueryException {
 		Element queryfind = html.select(xml.attr("query")).first();
-		if (queryfind == null)
-			throw new QueryException("element not found for query");
 		return queryfind;
 	}
 
@@ -94,7 +92,7 @@ public class WebScraper {
 	private static final void parseArray(Element array, Element xml, Element html, Collection<Map<String, Object>> result)
 			throws ParseException {
 		if (!xml.nodeName().equals(html.nodeName()))
-			throw new ParseException("nodenames do not correspond");
+			throw new ParseException("nodenames do not correspond: " + xml.nodeName() + "," + html.nodeName());
 		int size = Integer.MAX_VALUE;
 		int index = 1;
 		if (array.hasAttr("size")) {
@@ -110,7 +108,11 @@ public class WebScraper {
 			if (xml.children().size() > 0) {
 				for (int i = 0; i < xml.children().size(); i++) {
 					if (xml.child(i).hasAttr("query")) {
-						parse(xml.child(i), resolveQuery(xml.child(i), html), result, objmap);
+						Element queryfind = resolveQuery(xml.child(i), html);
+						if (queryfind == null)
+							continue;
+							//throw new QueryException("element not found for query: "+xml.attr("query"));
+						parse(xml.child(i), queryfind, result, objmap);
 					} else {
 						parse(xml.child(i), html.child(i), result, objmap);
 					}
@@ -142,7 +144,9 @@ public class WebScraper {
 				if (html.children().size() == 0)
 					throw new ParseException("XML does have children, while HTML does not");
 				if (xml.children().first().hasAttr("query")) {
-					parse(xml.children().first(), resolveQuery(xml.children().first(), html), objects, objmap);
+					Element queryfind = resolveQuery(xml.child(0), html);
+					if (queryfind != null)
+						parse(xml.children().first(), queryfind, objects, objmap);
 				} else {
 					parse(xml.children().first(), html.children().first(), objects, objmap);
 				}
@@ -153,7 +157,8 @@ public class WebScraper {
 			if (nextxml == null)
 				return;
 			if (nexthtml == null)
-				throw new ParseException("next element does not exist.");
+				return;
+				//TODO: Not sure about this delete: throw new ParseException("next element does not exist. last element:\n" + html.toString()+"\n\nxlm:\n"+xml.toString());
 			parse(nextxml, nexthtml, objects, objmap);
 			// }
 		} else if (xml.nodeName().equals("array")) {
@@ -167,7 +172,7 @@ public class WebScraper {
 
 		} else {
 			if (!xml.nodeName().equals(html.nodeName()))
-				throw new ParseException("nodenames do not correspond");
+				throw new ParseException("nodenames do not correspond: " + xml.nodeName() + "," + html.nodeName()+"\n"+html.toString());
 		}
 	}
 	
